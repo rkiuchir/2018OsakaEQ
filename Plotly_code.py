@@ -1,12 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # The code list used in Plotly
-
-# ## - Make Matplotlib color bar applicable in Plotly
-
-# In[2]:
-
+# This code is for converting color scale in Matplotlib to Plotly
 
 import matplotlib
 from matplotlib import cm
@@ -52,28 +44,5 @@ def Colorscale_Plotly(name):
 
     return Cscale
         
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
 
 
