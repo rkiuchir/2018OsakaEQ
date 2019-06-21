@@ -1,5 +1,5 @@
-# 2018OsakaEQ
-Plot 2018 Osaka earthquake aftershock distribution in 3-D interactive map
+# SeisPlot
+Plot recent earthquake aftershock distributions in 2-D and 3-D map
 
 This repo stores my personal python notes for learning how to play with python.
 
@@ -8,7 +8,10 @@ This event catalog was downloaded from NIED Hi-net website (http://www.hinet.bos
 
 
 ### Example
-#### 1. 3-D interactive map
+#### 1. 20190618 Yamagata-oki EQ (M6.6)
+
+
+#### 2. 2018 Northern Osaka EQ (M6.1)
 Each point shows aftershock with color of hours after the mainshock.
 3-D axis correspond to longitude, latitude, and depth.
 This figure is made with Plotly (https://plot.ly/python/).
