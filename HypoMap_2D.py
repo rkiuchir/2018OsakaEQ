@@ -13,7 +13,7 @@
 # #### - 2019 Yamagata-oki earthquake (M 6.7) aftershock activity
 # #### made by R.Kiuchi June, 2018
 
-# In[1]:
+# In[31]:
 
 
 get_ipython().run_line_magic('matplotlib', 'notebook')
@@ -42,7 +42,7 @@ outdir = homedir + '/results'
 
 # ## Import JMA event catalog
 
-# In[2]:
+# In[32]:
 
 
 # Setting the directory
@@ -83,7 +83,7 @@ JMA_evMag = np.array(JMAdata['Mag'])
 
 # ## - Import the fault data
 
-# In[3]:
+# In[33]:
 
 
 # Setting the directory
@@ -111,7 +111,7 @@ for i in range(len(fault_data)):
 
 # ## - Import the 2019 Yamagata-oki event catalog
 
-# In[4]:
+# In[34]:
 
 
 # Setting the directory
@@ -167,7 +167,7 @@ Timefrom_Mshock = (date - MshockTime)/np.timedelta64(1,'h')
 # For time from mainshock
 # Hours before and after mainshock
 Before = 0
-After = 48
+After = 96
 date = date[np.where(Timefrom_Mshock >= Before)]
 evlon = evlon[np.where(Timefrom_Mshock >= Before)]
 evlat = evlat[np.where(Timefrom_Mshock >= Before)]
@@ -185,7 +185,7 @@ Timefrom_Mshock = Timefrom_Mshock[np.where(Timefrom_Mshock <= After)]
 
 # ## - Static 2D hypocentral distribution map
 
-# In[8]:
+# In[15]:
 
 
 import seaborn as sns 
@@ -202,12 +202,12 @@ latmin = 37.5
 latmax = 39.5
 latbin = 1.0
 '''
-lonmin = 139.2
+lonmin = 139.3
 lonmax = 139.7
-lonbin = 0.2
-latmin = 38.4
+lonbin = 0.1
+latmin = 38.5
 latmax = 38.8
-latbin = 0.2
+latbin = 0.1
 
 
 ###############----Draw the basemap----###############
@@ -274,14 +274,14 @@ map.scatter(x, y, s=size, c=color, cmap=cpalette, alpha=0.6, lw=0,  antialiased=
 bx, by = map(139.49, 38.61)
 map.plot(bx, by, 'k*', linewidth=5, markersize=20, zorder=10)
 ax = plt.gca()
-pbx, pby = map(139.6, 38.5)
+pbx, pby = map(139.6, 38.6)
 D = 12.0
 fmech = [204.0, 56.6, 90.0]
 ax = plt.gca()
 # If you don't choose arcgis image for map
 #b = beach(fmech, xy=(pbx, pby), facecolor='black', width=2e4, linewidth=0.8, alpha=1.0)
 # If you choose arcgis image for map
-b = beach(fmech, xy=(pbx, pby), facecolor='black', width=0.08, linewidth=0.8, alpha=1.0)
+b = beach(fmech, xy=(pbx, pby), facecolor='black', width=0.05, linewidth=0.8, alpha=1.0)
 b.set_zorder(10)
 ax.add_collection(b)
 # Add lines
@@ -305,7 +305,7 @@ plt.savefig(outdir + "/20190618Yamagata-okiEQ2D.png")
 
 # ## - Timelapse
 
-# In[6]:
+# In[16]:
 
 
 def draw2DMap(i, date, evlon, evlat, evDepth, evMag, Timefrom_Mshock):
@@ -441,7 +441,7 @@ plt.show()
 
 # ## - Import the 2018 Osaka event catalog
 
-# In[5]:
+# In[23]:
 
 
 # Setting the directory
@@ -455,7 +455,18 @@ for i in range(len(file_list)):
     else:
         data = pd.concat([data, eachdata])
         
-        
+
+### If you download JMA Unified Catalog
+# Otherwise skip these part
+# Data fill NaN for empty cells
+data.replace('', np.nan, inplace=True)
+data['Mag'] = data['Mag'].str.strip('v')
+data['Mag'] = data['Mag'].str.strip('V')
+data['Mag'] = data['Mag'].str.strip('D')
+data['Mag'] = data['Mag'].astype(float)
+### If you download JMA Unified Catalog 
+
+
 # Data selection
 #data = data[data.Depth > 9] 
 
@@ -480,13 +491,13 @@ evMag = np.array(data['Mag'])
 
 
 # Calculate time difference from Foreshock and Mainshock
-MshockTime = date[np.where(evMag == 6.2)]
+MshockTime = date[np.where(evMag == 6.1)]
 Timefrom_Mshock = (date - MshockTime)/np.timedelta64(1,'h')
 
 ### Data filtering
 # For time from mainshock
 Before = 0
-After = 48
+After = 96
 date = date[np.where(Timefrom_Mshock >= Before)]
 evlon = evlon[np.where(Timefrom_Mshock >= Before)]
 evlat = evlat[np.where(Timefrom_Mshock >= Before)]
@@ -505,7 +516,7 @@ Timefrom_Mshock = Timefrom_Mshock[np.where(Timefrom_Mshock <= After)]
 
 # ## - Static 2D hypocentral distribution map
 
-# In[11]:
+# In[27]:
 
 
 import seaborn as sns 
@@ -534,14 +545,15 @@ fig = plt.figure(figsize=(10,10))
 
 map = Basemap(projection='merc',llcrnrlat=latmin,urcrnrlat=latmax,
               llcrnrlon=lonmin,urcrnrlon=lonmax,lat_ts=5,resolution='h')
-map.fillcontinents(color='#DDDDDD',zorder=0)
+#map.fillcontinents(color='#DDDDDD',zorder=0)
 #map.drawlsmask(land_color='0.4',resolution='h')
 
 
-#map = Basemap(llcrnrlon=lonmin,llcrnrlat=latmin,urcrnrlon=lonmax,urcrnrlat=latmax)
+map = Basemap(llcrnrlon=lonmin,llcrnrlat=latmin,urcrnrlon=lonmax,urcrnrlat=latmax)
 #http://server.arcgisonline.com/arcgis/rest/services
 #map.arcgisimage(service='ESRI_Imagery_World_2D', xpixels = 1500, verbose= True)
-#map.arcgisimage(service='World_Shaded_Relief', xpixels = 1500, verbose= True)
+map.arcgisimage(service='World_Shaded_Relief', xpixels = 1500, verbose= True)
+
 
 ###############----Draw the basemap----###############
 
@@ -595,9 +607,9 @@ D = 13.
 c = cpalette(D/cmax)
 ax = plt.gca()
 # If you don't choose arcgis image for map
-b = beach(fmech, xy=(pbx, pby), facecolor='black', width=2e3, linewidth=0.8, alpha=1.0)
+#b = beach(fmech, xy=(pbx, pby), facecolor='black', width=2e3, linewidth=0.8, alpha=1.0)
 # If you choose arcgis image for map
-#b = beach(fmech, xy=(pbx, pby), facecolor=list(c[0:3]), width=0.015, linewidth=0.8, alpha=1.0)
+b = beach(fmech, xy=(pbx, pby), facecolor=list(c[0:3]), width=0.015, linewidth=0.8, alpha=1.0)
 b.set_zorder(10)
 ax.add_collection(b)
 # Add lines
@@ -621,7 +633,7 @@ plt.savefig(outdir + "/2018OsakaEQ2D.png")
 
 # ## - Time Lapse
 
-# In[ ]:
+# In[29]:
 
 
 def draw2DMap(i, date, evlon, evlat, evDepth, evMag, Timefrom_Mshock):
@@ -632,7 +644,7 @@ def draw2DMap(i, date, evlon, evlat, evDepth, evMag, Timefrom_Mshock):
     # Data selection
     # Select the date range
     Dstart = np.datetime64('2018-06-18T05:00:00.000000000')
-    Dend = np.datetime64('2018-06-19T07:00:00.000000000')
+    Dend = np.datetime64('2018-06-20T05:00:00.000000000')
 
     Dbin = 1
     Dnum = int((Dend - Dstart)/np.timedelta64(Dbin,'h'))
@@ -672,15 +684,15 @@ def draw2DMap(i, date, evlon, evlat, evDepth, evMag, Timefrom_Mshock):
 
     ###############----Draw the basemap----###############
     map = Basemap(projection='merc',llcrnrlat=latmin,urcrnrlat=latmax,
-                  llcrnrlon=lonmin,urcrnrlon=lonmax,lat_ts=5,resolution='i')
-    map.fillcontinents(color='#DDDDDD',zorder=0)
+              llcrnrlon=lonmin,urcrnrlon=lonmax,lat_ts=5,resolution='h')
+    #map.fillcontinents(color='#DDDDDD',zorder=0)
     #map.drawlsmask(land_color='0.4',resolution='h')
 
-    #map = Basemap(llcrnrlon=lonmin,llcrnrlat=latmin,urcrnrlon=lonmax,urcrnrlat=latmax)
-    #http://server.arcgisonline.com/arcgis/rest/services
 
+    map = Basemap(llcrnrlon=lonmin,llcrnrlat=latmin,urcrnrlon=lonmax,urcrnrlat=latmax)
+    #http://server.arcgisonline.com/arcgis/rest/services
     #map.arcgisimage(service='ESRI_Imagery_World_2D', xpixels = 1500, verbose= True)
-    #map.arcgisimage(service='World_Shaded_Relief', xpixels = 1500, verbose= True)
+    map.arcgisimage(service='World_Shaded_Relief', xpixels = 1500, verbose= True)
 
     ###############----Draw the basemap----###############
 
@@ -742,7 +754,7 @@ def draw2DMap(i, date, evlon, evlat, evDepth, evMag, Timefrom_Mshock):
 fig = plt.figure(figsize=(10,10))
 
 Dstart = np.datetime64('2018-06-18T05:00:00.000000000')
-Dend = np.datetime64('2018-06-19T07:00:00.000000000')
+Dend = np.datetime64('2018-06-20T05:00:00.000000000')
 
 Dbin = 1
 Dnum = int((Dend - Dstart)/np.timedelta64(Dbin,'h'))
