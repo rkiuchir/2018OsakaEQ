@@ -7,7 +7,7 @@ This repo stores my personal python notes for learning how to play with python.
 This event catalog was downloaded from NIED Hi-net website (http://www.hinet.bosai.go.jp/?LANG=en).
 
 
-### Example
+### Exampled events
 #### 1. 20190618 Yamagata-oki EQ (M6.6)
 
 
