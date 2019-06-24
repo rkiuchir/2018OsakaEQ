@@ -17,7 +17,7 @@
 # 
 # Visualise aftershock distribution to capture clusters, fault planes, and spatio-temporal evolution
 
-# In[1]:
+# In[2]:
 
 
 from plotly.offline import iplot, init_notebook_mode, plot
@@ -45,11 +45,13 @@ outdir = homedir + '/results'
 
 # ## - Import the data file for earthquakes
 
-# In[2]:
+# In[4]:
 
 
-###############----Read the Hi-net event catalog----###############
-file_list = glob.glob("data/2019Yamagata-oki/HinetHypov2.csv")
+# Setting the directory
+datadir = homedir + '/data/2019Yamagata-oki'
+
+file_list = glob.glob(datadir + "/HinetHypo.csv")
 for i in range(len(file_list)):
     eachdata = pd.read_csv(file_list[i])
     if (i == 0):
@@ -57,7 +59,18 @@ for i in range(len(file_list)):
     else:
         data = pd.concat([data, eachdata])
 
-        
+    
+### If you download JMA Unified Catalog
+# Otherwise skip these part
+# Data fill NaN for empty cells
+data.replace('', np.nan, inplace=True)
+data['Mag'] = data['Mag'].str.strip('v')
+data['Mag'] = data['Mag'].str.strip('V')
+data['Mag'] = data['Mag'].str.strip('D')
+data['Mag'] = data['Mag'].astype(float)
+### If you download JMA Unified Catalog 
+
+
 # Data selection
 #data = data[data.Depth > 9] 
 
@@ -68,6 +81,10 @@ data = data[data.Evla < 35.0]
 data = data[data.Evlo >= 135.45]
 data = data[data.Evlo < 135.75]
 '''
+data['Mag'] = data['Mag'].str.strip('v')
+data['Mag'] = data['Mag'].str.strip('V')
+data['Mag'] = data['Mag'].str.strip('D')
+data['Mag'] = data['Mag'].astype(float)
 data = data[data.Mag >= 1.0]
 
 # Change format to datetime for event date
@@ -82,22 +99,33 @@ evMag = np.array(data['Mag'])
 
 
 # Calculate time difference from Foreshock and Mainshock
-MshockTime = date[np.where(evMag == 6.6)]
+MshockTime = date[np.where(evMag == 6.7)]
 Timefrom_Mshock = (date - MshockTime)/np.timedelta64(1,'h')
 
 ### Data filtering
 # For time from mainshock
-date = date[np.where(Timefrom_Mshock >= 0)]
-evlon = evlon[np.where(Timefrom_Mshock >= 0)]
-evlat = evlat[np.where(Timefrom_Mshock >= 0)]
-evMag = evMag[np.where(Timefrom_Mshock >= 0)]
-evDepth = evDepth[np.where(Timefrom_Mshock >= 0)]
-Timefrom_Mshock = Timefrom_Mshock[np.where(Timefrom_Mshock >= 0)]
+# Hours before and after mainshock
+Before = 0
+After = 48
+date = date[np.where(Timefrom_Mshock >= Before)]
+evlon = evlon[np.where(Timefrom_Mshock >= Before)]
+evlat = evlat[np.where(Timefrom_Mshock >= Before)]
+evMag = evMag[np.where(Timefrom_Mshock >= Before)]
+evDepth = evDepth[np.where(Timefrom_Mshock >= Before)]
+Timefrom_Mshock = Timefrom_Mshock[np.where(Timefrom_Mshock >= Before)]
+
+date = date[np.where(Timefrom_Mshock <= After)]
+evlon = evlon[np.where(Timefrom_Mshock <= After)]
+evlat = evlat[np.where(Timefrom_Mshock <= After)]
+evMag = evMag[np.where(Timefrom_Mshock <= After)]
+evDepth = evDepth[np.where(Timefrom_Mshock <= After)]
+Timefrom_Mshock = Timefrom_Mshock[np.where(Timefrom_Mshock <= After)]
+
 
 
 # ## Prepare 3D scatter map
 
-# In[3]:
+# In[5]:
 
 
 reload(Pcode)
@@ -219,7 +247,7 @@ seis_2D = go.Scatter3d(x = evlon,
 
 # ## - Import Topography Data
 
-# In[4]:
+# In[6]:
 
 
 import ReadGeo
@@ -237,7 +265,7 @@ lon_topo, lat_topo, topo = ReadGeo.Etopo(lon_area, lat_area, resolution)
 
 
 
-# In[5]:
+# In[7]:
 
 
 # Input value
@@ -270,7 +298,7 @@ topo_surf = go.Surface(z=z_offset, x=x, y=y,
 
 # ## - Draw 3D Map
 
-# In[6]:
+# In[8]:
 
 
 layout = go.Layout(
@@ -299,7 +327,7 @@ plot(fig, validate = False, filename=outdir+'/2019Yamagata_3DEQ.html', auto_open
 
 # ## - Import the data file for earthquakes
 
-# In[32]:
+# In[9]:
 
 
 ###############----Read the Hi-net event catalog----###############
@@ -341,18 +369,27 @@ Timefrom_Mshock = (date - MshockTime)/np.timedelta64(1,'h')
 
 ### Data filtering
 # For time from mainshock
-date = date[np.where(Timefrom_Mshock >= 0)]
-evlon = evlon[np.where(Timefrom_Mshock >= 0)]
-evlat = evlat[np.where(Timefrom_Mshock >= 0)]
-evMag = evMag[np.where(Timefrom_Mshock >= 0)]
-evDepth = evDepth[np.where(Timefrom_Mshock >= 0)]
-Timefrom_Mshock = Timefrom_Mshock[np.where(Timefrom_Mshock >= 0)]
+Before = 0
+After = 48
+date = date[np.where(Timefrom_Mshock >= Before)]
+evlon = evlon[np.where(Timefrom_Mshock >= Before)]
+evlat = evlat[np.where(Timefrom_Mshock >= Before)]
+evMag = evMag[np.where(Timefrom_Mshock >= Before)]
+evDepth = evDepth[np.where(Timefrom_Mshock >= Before)]
+Timefrom_Mshock = Timefrom_Mshock[np.where(Timefrom_Mshock >= Before)]
+
+date = date[np.where(Timefrom_Mshock <= After)]
+evlon = evlon[np.where(Timefrom_Mshock <= After)]
+evlat = evlat[np.where(Timefrom_Mshock <= After)]
+evMag = evMag[np.where(Timefrom_Mshock <= After)]
+evDepth = evDepth[np.where(Timefrom_Mshock <= After)]
+Timefrom_Mshock = Timefrom_Mshock[np.where(Timefrom_Mshock <= After)]
 
 
 
 # ## Prepare 3D scatter map
 
-# In[33]:
+# In[10]:
 
 
 reload(Pcode)
